@@ -6,14 +6,27 @@ const app = {
 
     init() {
         const saved = localStorage.getItem('budgetData');
-        if (saved) this.data = JSON.parse(saved);
+        if (saved) {
+            this.data = JSON.parse(saved);
+        }
         document.getElementById('trans-date').valueAsDate = new Date();
+        
+        // Listen for filter changes
+        document.getElementById('filter-category').addEventListener('change', () => this.renderHistory());
+        
         this.render();
     },
 
     save() {
         localStorage.setItem('budgetData', JSON.stringify(this.data));
         this.render();
+    },
+
+    render() {
+        this.updateSummary();
+        this.renderDashboard();
+        this.renderHistory();
+        this.syncSettingsFields();
     },
 
     updateSummary() {
@@ -34,7 +47,6 @@ const app = {
         const container = document.getElementById('category-cards');
         container.innerHTML = '';
 
-        // Only show progress for expense categories
         ['Needs', 'Wants', 'Savings'].forEach(cat => {
             const limit = this.data.limits[cat] || 0;
             const spent = this.data.transactions
@@ -55,7 +67,35 @@ const app = {
                     <div class="progress-container">
                         <div class="progress-bar" style="width: ${Math.min(percent, 100)}%; background: ${color}"></div>
                     </div>
-                    <small style="color: var(--text-dim)">Limit: $${limit} | Spent: $${spent.toFixed(2)}</small>
+                    <small style="color: var(--text-dim)">Remaining: $${(limit - spent).toFixed(2)}</small>
+                </div>
+            `;
+        });
+    },
+
+    renderHistory() {
+        const filter = document.getElementById('filter-category').value;
+        const list = document.getElementById('transaction-list');
+        list.innerHTML = '';
+
+        const filtered = filter === 'All' 
+            ? this.data.transactions 
+            : this.data.transactions.filter(t => t.category === filter);
+
+        filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
+            const isIncome = t.category === 'Income';
+            list.innerHTML += `
+                <div class="item">
+                    <div class="item-info">
+                        <div><strong>${t.description || t.category}</strong></div>
+                        <small>${t.date} • ${t.category}</small>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="color: ${isIncome ? 'var(--safe)' : 'var(--text)'}">
+                            ${isIncome ? '+' : '-'}$${t.amount.toFixed(2)}
+                        </div>
+                        <button onclick="app.deleteTransaction(${t.id})" style="color:var(--danger); padding:0; font-size:12px; background:none">Delete</button>
+                    </div>
                 </div>
             `;
         });
@@ -72,11 +112,8 @@ const app = {
         const newTrans = { id: Date.now(), amount, category, description, date };
         this.data.transactions.push(newTrans);
         
-        // Budget Warning (only for expenses)
         if (category !== 'Income') {
-            const catSpent = this.data.transactions
-                .filter(t => t.category === category)
-                .reduce((s,t) => s + t.amount, 0);
+            const catSpent = this.data.transactions.filter(t => t.category === category).reduce((s,t) => s + t.amount, 0);
             if (this.data.limits[category] > 0 && catSpent > this.data.limits[category]) {
                 alert(`Warning: ${category} budget exceeded!`);
             }
@@ -119,8 +156,8 @@ const app = {
     },
 
     resetMonth() {
-        if (confirm("Clear all transactions?")) {
-            this.data.transactions = [];
+        if (confirm("Reset everything? All data will be lost.")) {
+            this.data = { limits: { Needs: 0, Wants: 0, Savings: 0 }, transactions: [] };
             this.save();
         }
     },
@@ -129,24 +166,18 @@ const app = {
         const blob = new Blob([JSON.stringify(this.data, null, 2)], {type : 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `budget-export-${new Date().toISOString().slice(0,10)}.json`;
-        a.click();
+        a.href = url; a.download = `budget-export.json`; a.click();
     },
 
     importData(e) {
-        const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = (event) => {
             this.data = JSON.parse(event.target.result);
             this.save();
         };
-        reader.readAsText(file);
+        reader.readAsText(e.target.files[0]);
     }
 };
 
-// Listen for filter changes
-document.getElementById('filter-category').addEventListener('change', () => app.renderHistory());
-
-// Initialize
 app.init();
+
