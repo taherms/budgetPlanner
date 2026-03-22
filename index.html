@@ -8,17 +8,17 @@
 </head>
 <body>
     <header class="sticky-header">
-    <div class="summary-card">
-        <div class="balance-item">
-            <small>Available to Spend</small>
-            <h1 id="total-remaining">$0.00</h1>
+        <div class="summary-card">
+            <div class="balance-item">
+                <small>Available to Spend</small>
+                <h1 id="total-remaining">$0.00</h1>
+            </div>
+            <div class="summary-details">
+                <div><small>Income</small><p id="total-income">$0</p></div>
+                <div><small>Expenses</small><p id="total-spent">$0</p></div>
+            </div>
         </div>
-        <div class="summary-details">
-            <div><small>Income</small><p id="total-income">$0</p></div>
-            <div><small>Expenses</small><p id="total-spent">$0</p></div>
-        </div>
-    </div>
-</header>
+    </header>
 
     <main id="app">
         <!-- Dashboard Section -->
@@ -31,6 +31,7 @@
             <div class="filter-bar">
                 <select id="filter-category">
                     <option value="All">All Transactions</option>
+                    <option value="Income">Income</option>
                     <option value="Needs">Needs</option>
                     <option value="Wants">Wants</option>
                     <option value="Savings">Savings</option>
@@ -45,15 +46,15 @@
                 <h3>Set Monthly Limits</h3>
                 <div class="input-group">
                     <label>Needs</label>
-                    <input type="number" id="limit-needs" placeholder="3000">
+                    <input type="number" id="limit-needs">
                 </div>
                 <div class="input-group">
                     <label>Wants</label>
-                    <input type="number" id="limit-wants" placeholder="1500">
+                    <input type="number" id="limit-wants">
                 </div>
                 <div class="input-group">
                     <label>Savings</label>
-                    <input type="number" id="limit-savings" placeholder="1000">
+                    <input type="number" id="limit-savings">
                 </div>
                 <button onclick="app.updateLimits()" class="btn-primary">Save Limits</button>
             </div>
@@ -61,32 +62,31 @@
                 <button onclick="app.exportData()" class="btn-outline">Export JSON</button>
                 <button onclick="document.getElementById('import-file').click()" class="btn-outline">Import JSON</button>
                 <input type="file" id="import-file" hidden onchange="app.importData(event)">
-                <button onclick="app.resetMonth()" class="btn-danger">Reset Month</button>
+                <button onclick="app.resetMonth()" class="btn-danger">Reset All Data</button>
             </div>
         </section>
     </main>
 
-    <!-- Add Transaction FAB/Modal -->
     <button class="fab" onclick="app.toggleModal(true)">+</button>
 
     <div id="modal" class="modal hidden">
-    <div class="modal-content">
-        <h3>Add Transaction</h3>
-        <input type="number" id="trans-amount" placeholder="0.00" inputmode="decimal">
-        <select id="trans-category">
-            <option value="Income">💰 Income</option>
-            <option value="Needs">🏠 Needs</option>
-            <option value="Wants">🍦 Wants</option>
-            <option value="Savings">🏦 Savings</option>
-        </select>
-        <input type="text" id="trans-desc" placeholder="Description (Optional)">
-        <input type="date" id="trans-date">
-        <div class="modal-btns">
-            <button onclick="app.toggleModal(false)" class="btn-secondary">Cancel</button>
-            <button onclick="app.addTransaction()" class="btn-primary">Add</button>
+        <div class="modal-content">
+            <h3>Add Transaction</h3>
+            <input type="number" id="trans-amount" placeholder="0.00" inputmode="decimal">
+            <select id="trans-category">
+                <option value="Income">💰 Income</option>
+                <option value="Needs" selected>🏠 Needs</option>
+                <option value="Wants">🍦 Wants</option>
+                <option value="Savings">🏦 Savings</option>
+            </select>
+            <input type="text" id="trans-desc" placeholder="Description (Optional)">
+            <input type="date" id="trans-date">
+            <div class="modal-btns">
+                <button onclick="app.toggleModal(false)" class="btn-secondary">Cancel</button>
+                <button onclick="app.addTransaction()" class="btn-primary">Add</button>
+            </div>
         </div>
     </div>
-</div>
 
     <nav class="bottom-nav">
         <button onclick="app.switchView('dashboard')" class="nav-item active">Dash</button>
