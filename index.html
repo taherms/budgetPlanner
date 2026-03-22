@@ -8,17 +8,17 @@
 </head>
 <body>
     <header class="sticky-header">
-        <div class="summary-card">
-            <div class="balance-item">
-                <small>Remaining</small>
-                <h1 id="total-remaining">$0.00</h1>
-            </div>
-            <div class="summary-details">
-                <div><small>Budget</small><p id="total-budget">$0</p></div>
-                <div><small>Spent</small><p id="total-spent">$0</p></div>
-            </div>
+    <div class="summary-card">
+        <div class="balance-item">
+            <small>Available to Spend</small>
+            <h1 id="total-remaining">$0.00</h1>
         </div>
-    </header>
+        <div class="summary-details">
+            <div><small>Income</small><p id="total-income">$0</p></div>
+            <div><small>Expenses</small><p id="total-spent">$0</p></div>
+        </div>
+    </div>
+</header>
 
     <main id="app">
         <!-- Dashboard Section -->
@@ -70,22 +70,23 @@
     <button class="fab" onclick="app.toggleModal(true)">+</button>
 
     <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Add Transaction</h3>
-            <input type="number" id="trans-amount" placeholder="Amount" inputmode="decimal">
-            <select id="trans-category">
-                <option value="Needs">Needs</option>
-                <option value="Wants">Wants</option>
-                <option value="Savings">Savings</option>
-            </select>
-            <input type="text" id="trans-desc" placeholder="Description (Optional)">
-            <input type="date" id="trans-date">
-            <div class="modal-btns">
-                <button onclick="app.toggleModal(false)" class="btn-secondary">Cancel</button>
-                <button onclick="app.addTransaction()" class="btn-primary">Add</button>
-            </div>
+    <div class="modal-content">
+        <h3>Add Transaction</h3>
+        <input type="number" id="trans-amount" placeholder="0.00" inputmode="decimal">
+        <select id="trans-category">
+            <option value="Income">💰 Income</option>
+            <option value="Needs">🏠 Needs</option>
+            <option value="Wants">🍦 Wants</option>
+            <option value="Savings">🏦 Savings</option>
+        </select>
+        <input type="text" id="trans-desc" placeholder="Description (Optional)">
+        <input type="date" id="trans-date">
+        <div class="modal-btns">
+            <button onclick="app.toggleModal(false)" class="btn-secondary">Cancel</button>
+            <button onclick="app.addTransaction()" class="btn-primary">Add</button>
         </div>
     </div>
+</div>
 
     <nav class="bottom-nav">
         <button onclick="app.switchView('dashboard')" class="nav-item active">Dash</button>
