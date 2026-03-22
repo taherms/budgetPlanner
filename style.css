@@ -1,0 +1,72 @@
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --primary: #38bdf8;
+    --accent: #818cf8;
+    --text: #f8fafc;
+    --text-dim: #94a3b8;
+    --safe: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
+
+.sticky-header {
+    position: sticky; top: 0; background: var(--bg); z-index: 10; padding: 1rem;
+    border-bottom: 1px solid #334155;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    padding: 1.5rem; border-radius: 1.25rem; color: white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+}
+
+.summary-details { display: flex; justify-content: space-between; margin-top: 1rem; opacity: 0.9; }
+
+.view { padding: 1rem; animation: fadeIn 0.3s ease; }
+.hidden { display: none !important; }
+
+.card { background: var(--card); padding: 1.25rem; border-radius: 1rem; margin-bottom: 1rem; }
+
+/* Progress Bar */
+.progress-container { height: 8px; background: #334155; border-radius: 4px; margin: 10px 0; overflow: hidden; }
+.progress-bar { height: 100%; transition: width 0.5s ease, background 0.3s; }
+
+/* Form Elements */
+input, select {
+    width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155;
+    background: #0f172a; color: white; font-size: 16px;
+}
+
+button { padding: 12px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
+.btn-primary { background: var(--primary); color: var(--bg); width: 100%; }
+.btn-secondary { background: transparent; color: var(--text-dim); }
+.btn-outline { background: transparent; border: 1px solid var(--text-dim); color: var(--text); margin-top: 5px; }
+.btn-danger { background: var(--danger); color: white; width: 100%; margin-top: 20px; }
+
+/* FAB */
+.fab {
+    position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px;
+    border-radius: 30px; background: var(--primary); color: var(--bg);
+    font-size: 30px; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+}
+
+/* History List */
+.item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding: 12px 0; }
+.item-info small { color: var(--text-dim); }
+
+/* Navigation */
+.bottom-nav {
+    position: fixed; bottom: 0; width: 100%; height: 70px; background: var(--card);
+    display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155;
+}
+.nav-item { background: none; color: var(--text-dim); }
+.nav-item.active { color: var(--primary); }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; padding: 1rem; z-index: 20; }
+.modal-content { background: var(--card); width: 100%; border-radius: 1.5rem; padding: 1.5rem; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
