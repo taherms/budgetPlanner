@@ -5,12 +5,8 @@ const app = {
     },
 
     init() {
-        // Load data from localStorage or set defaults
         const saved = localStorage.getItem('budgetData');
-        if (saved) {
-            this.data = JSON.parse(saved);
-        }
-        
+        if (saved) this.data = JSON.parse(saved);
         document.getElementById('trans-date').valueAsDate = new Date();
         this.render();
     },
@@ -20,28 +16,27 @@ const app = {
         this.render();
     },
 
-    render() {
-        this.updateSummary();
-        this.renderDashboard();
-        this.renderHistory();
-        this.syncSettingsFields();
-    },
-
     updateSummary() {
-        const totalBudget = Object.values(this.data.limits).reduce((a, b) => a + b, 0);
-        const totalSpent = this.data.transactions.reduce((sum, t) => sum + t.amount, 0);
-        
-        document.getElementById('total-budget').innerText = `$${totalBudget}`;
-        document.getElementById('total-spent').innerText = `$${totalSpent.toFixed(2)}`;
-        document.getElementById('total-remaining').innerText = `$${(totalBudget - totalSpent).toFixed(2)}`;
+        const income = this.data.transactions
+            .filter(t => t.category === 'Income')
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        const expenses = this.data.transactions
+            .filter(t => t.category !== 'Income')
+            .reduce((sum, t) => sum + t.amount, 0);
+
+        document.getElementById('total-income').innerText = `$${income.toFixed(2)}`;
+        document.getElementById('total-spent').innerText = `$${expenses.toFixed(2)}`;
+        document.getElementById('total-remaining').innerText = `$${(income - expenses).toFixed(2)}`;
     },
 
     renderDashboard() {
         const container = document.getElementById('category-cards');
         container.innerHTML = '';
 
-        Object.keys(this.data.limits).forEach(cat => {
-            const limit = this.data.limits[cat];
+        // Only show progress for expense categories
+        ['Needs', 'Wants', 'Savings'].forEach(cat => {
+            const limit = this.data.limits[cat] || 0;
             const spent = this.data.transactions
                 .filter(t => t.category === cat)
                 .reduce((sum, t) => sum + t.amount, 0);
@@ -60,32 +55,7 @@ const app = {
                     <div class="progress-container">
                         <div class="progress-bar" style="width: ${Math.min(percent, 100)}%; background: ${color}"></div>
                     </div>
-                    <small style="color: var(--text-dim)">$${(limit - spent).toFixed(2)} remaining</small>
-                </div>
-            `;
-        });
-    },
-
-    renderHistory() {
-        const filter = document.getElementById('filter-category').value;
-        const list = document.getElementById('transaction-list');
-        list.innerHTML = '';
-
-        const filtered = filter === 'All' 
-            ? this.data.transactions 
-            : this.data.transactions.filter(t => t.category === filter);
-
-        filtered.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(t => {
-            list.innerHTML += `
-                <div class="item">
-                    <div class="item-info">
-                        <div><strong>${t.description || t.category}</strong></div>
-                        <small>${t.date} • ${t.category}</small>
-                    </div>
-                    <div style="text-align:right">
-                        <div>$${t.amount.toFixed(2)}</div>
-                        <button onclick="app.deleteTransaction(${t.id})" style="color:var(--danger); padding:0; font-size:12px; background:none">Delete</button>
-                    </div>
+                    <small style="color: var(--text-dim)">Limit: $${limit} | Spent: $${spent.toFixed(2)}</small>
                 </div>
             `;
         });
@@ -102,14 +72,18 @@ const app = {
         const newTrans = { id: Date.now(), amount, category, description, date };
         this.data.transactions.push(newTrans);
         
-        // Check budget warning
-        const catSpent = this.data.transactions.filter(t => t.category === category).reduce((s,t) => s + t.amount, 0);
-        if (catSpent > this.data.limits[category]) alert(`Warning: ${category} budget exceeded!`);
+        // Budget Warning (only for expenses)
+        if (category !== 'Income') {
+            const catSpent = this.data.transactions
+                .filter(t => t.category === category)
+                .reduce((s,t) => s + t.amount, 0);
+            if (this.data.limits[category] > 0 && catSpent > this.data.limits[category]) {
+                alert(`Warning: ${category} budget exceeded!`);
+            }
+        }
 
         this.toggleModal(false);
         this.save();
-        
-        // Clear inputs
         document.getElementById('trans-amount').value = '';
         document.getElementById('trans-desc').value = '';
     },
